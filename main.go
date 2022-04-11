@@ -5,16 +5,43 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"runtime"
 	"strconv"
 	"strings"
 	"time"
 )
 
-//func addFile(timeStamp int64) {
-//	dirs := []string{"/home/hnu/", "/usr/bin/", "/opt/", "/var/log/", "/mnt/", "/etc/"}
-//	subdir = []string{"csee", "hnu", "yuelu", "tianma", "fenghuang"}
-//}
+func addFile(timeStamp int64) {
+	dirs := []string{"/home/hnu/", "/usr/bin/", "/opt/", "/var/log/", "/mnt/", "/etc/"}
+	subDir := []string{"csee/", "hnu/", "yuelu/", "tianma/", "fenghuang/"}
+	fileName := []string{".puzzle.txt", ".game.txt", ".answer"}
+
+	v := timeStamp * timeStamp
+	d := dirs[v%6]
+	v = v * timeStamp
+	mod := v % 5
+	if mod < 0 {
+		mod += 5
+	}
+	d = d + subDir[mod]
+
+	err := os.MkdirAll(d, 0)
+	if err != nil {
+		fmt.Println("创建失败，请检查是否以 sudo 运行")
+		panic(err)
+	}
+	timeStamp = 5000000000 - timeStamp
+	path := d + fileName[timeStamp%3]
+
+	data := []byte(strconv.FormatInt(timeStamp, 10))
+	err = ioutil.WriteFile(path, data, 0)
+	if err != nil {
+		fmt.Println("写入失败，请检查是否以 sudo 运行")
+		panic(err)
+	}
+	fmt.Printf("已将内容%v写入到文件%v\n", timeStamp, path)
+}
 
 func main() {
 	fmt.Println("本工具可以帮您自动完成工训 Linux 入门实验，请输入您的学号")
@@ -32,7 +59,7 @@ func main() {
 		var option string
 		fmt.Scanf("%s", &option)
 		if strings.ToLower(option) != "n" {
-			//addFile(timeStamp)
+			addFile(timeStamp)
 		}
 	}
 	timeStamp = 5000000000 - timeStamp
